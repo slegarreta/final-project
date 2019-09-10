@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
 import App from './App';
+import Card from './Card';
 import Explore from './Explore';
 import Favorites from './Favorites';
 import firebase from 'firebase';
@@ -124,7 +125,9 @@ export default class Router extends React.Component {
 
   render() {
     console.log(this.state.data.response && this.state.favoritePlaces)
-
+    let searchArray = this.state.data.response && this.state.searchArray.map((place,index) => {
+      return <Card place={place} delete={this.delete} favoriteClick={this.favoriteClick} />;
+    });
     return (
       <BrowserRouter>
         <Link to="/">Home</Link>
@@ -145,18 +148,9 @@ export default class Router extends React.Component {
 
 
           <div className="row justify-content-center">
-                {this.state.data.response && this.state.searchArray.map((place,index) => {
-                  return (
-                    <div className="card col-lg-4 p-2 m-1">
-                         <p className="row justify-content-center title">{place.title}</p>
-                         <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
-                         <p className="row justify-content-center location">{place.city}, {place.country}</p>
-                         <button className="btn btn-danger" size="sm">Remove</button>
-                         <button className="btn btn-success" size="sm" onClick={() => this.favoriteClick(place)}>Favorite this</button>
-                     </div>
-                  );
-                })}
+                {searchArray}
           </div>
+
           <h2 className="row justify-content-center">Favorites</h2>
           <div className="row justify-content-center">
                 {this.state.data.response && this.state.favoritePlaces.map((place,index) => {
@@ -165,6 +159,10 @@ export default class Router extends React.Component {
                          <p className="row justify-content-center title">{place.item.title}</p>
                          <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
                          <p className="row justify-content-center location">{place.item.city}, {place.item.country}</p>
+                         <input type="text" value={this.state.value} onChange={this.handleUpdateChange} />
+                        <button onClick={(e) => this.triggerUpdateChange(e)}>
+                             Update Me
+                        </button>
                          <button className="btn btn-danger" size="sm" onClick={(e) => this.delete(place.key)}>Remove</button>
                      </div>
                   );
