@@ -23,7 +23,6 @@ export default class Router extends React.Component {
 		data: [],
     inputValue: '',
     searchArray: [],
-    favoriteSavedArray: [],
     favoritePlaces: []
 	};
 
@@ -45,10 +44,6 @@ export default class Router extends React.Component {
     })
     let favoriteSavedArray = database.ref('favoriteSavedFirebase');
 
-		this.setState({
-			favoriteSavedArray: favoriteSavedArray
-		});
-
 
 		favoriteSavedArray.on('value', (response) => {
 			let favoritesData = response.val();
@@ -56,7 +51,10 @@ export default class Router extends React.Component {
 			let favoritesArray = [];
 
 			for (let item in favoritesData) {
-				favoritesArray.push(favoritesData[item]);
+				favoritesArray.push({
+          key: item,
+          item: favoritesData[item]
+        });
 				console.log(favoritesArray)
 			}
 
@@ -110,10 +108,10 @@ export default class Router extends React.Component {
   }
 
   favoriteClick = (placeObject) => {
-    this.state.favoriteSavedArray.push({
+    this.state.database.ref('favoriteSavedFirebase').push({
       ...placeObject
     })
-    console.log(this.state.favoriteSavedArray)
+    console.log(this.state.favoritePlaces)
   }
 
 
@@ -125,7 +123,7 @@ export default class Router extends React.Component {
 
 
   render() {
-    console.log(this.state.data.response && this.state.searchArray)
+    console.log(this.state.data.response && this.state.favoritePlaces)
 
     return (
       <BrowserRouter>
@@ -153,6 +151,7 @@ export default class Router extends React.Component {
                          <p className="row justify-content-center title">{place.title}</p>
                          <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
                          <p className="row justify-content-center location">{place.city}, {place.country}</p>
+                         <button className="btn btn-danger" size="sm">Remove</button>
                          <button className="btn btn-success" size="sm" onClick={() => this.favoriteClick(place)}>Favorite this</button>
                      </div>
                   );
@@ -163,9 +162,9 @@ export default class Router extends React.Component {
                 {this.state.data.response && this.state.favoritePlaces.map((place,index) => {
                   return (
                     <div className="card col-lg-4 p-2 m-1">
-                         <p className="row justify-content-center title">{place.title}</p>
+                         <p className="row justify-content-center title">{place.item.title}</p>
                          <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
-                         <p className="row justify-content-center location">{place.city}, {place.country}</p>
+                         <p className="row justify-content-center location">{place.item.city}, {place.item.country}</p>
                          <button className="btn btn-danger" size="sm" onClick={(e) => this.delete(place.key)}>Remove</button>
                      </div>
                   );
