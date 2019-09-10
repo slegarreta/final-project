@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
 import App from './App';
-import About from './About';
-import Contact from './Contact';
+import Explore from './Explore';
+import Favorites from './Favorites';
 import firebase from 'firebase';
 // Firebase App (the core Firebase SDK) is always required and
 // must be listed before other Firebase SDKs
@@ -23,7 +23,8 @@ export default class Router extends React.Component {
 		data: [],
     inputValue: '',
     searchArray: [],
-    favoriteArray: []
+    favoriteSavedArray: [],
+    favoritePlaces: []
 	};
 
   componentDidMount() {
@@ -38,11 +39,33 @@ export default class Router extends React.Component {
   };
     firebase.initializeApp(firebaseConfig);
 		let database = firebase.database();
+
+    this.setState({
+			database: database
+    })
     let favoriteSavedArray = database.ref('favoriteSavedFirebase');
 
 		this.setState({
 			favoriteSavedArray: favoriteSavedArray
 		});
+
+
+		favoriteSavedArray.on('value', (response) => {
+			let favoritesData = response.val();
+
+			let favoritesArray = [];
+
+			for (let item in favoritesData) {
+				favoritesArray.push(favoritesData[item]);
+				console.log(favoritesArray)
+			}
+
+			this.setState({
+				favoritePlaces: favoritesArray
+			})
+
+
+		})
 	}
 
 
@@ -90,42 +113,67 @@ export default class Router extends React.Component {
     this.state.favoriteSavedArray.push({
       ...placeObject
     })
-
     console.log(this.state.favoriteSavedArray)
-
   }
+
+
+  	delete = (key) => {
+  		this.state.database.ref('favoriteSavedFirebase/' + key).remove();
+      console.log(this.state.database)
+  	};
+
 
 
   render() {
     console.log(this.state.data.response && this.state.searchArray)
+
     return (
       <BrowserRouter>
         <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/contact">Contact</Link>
+        <Link to="/explore">Explore</Link>
+        <Link to="/favorites">Favorites</Link>
 
         <Route path="/" component={App} exact />
-        <Route path="/about" component={About} />
-        <Route path="/contact" component={Contact} />
+        <Route path="/explore" component={Explore} />
+        <Route path="/favorites" component={Favorites} />
+
         <main className="container p-3">
           <h1 className="row justify-content-center">{this.state.websiteName}</h1>
           <form className="row justify-content-center" onSubmit={this.handleSubmit}>
             <input type="text" className="" value={this.state.inputValue} onChange={this.handleChange} />
             <button className="btn btn-primary">Where do you want to explore?</button>
           </form>
+          <h2 className="row justify-content-center">Search Results</h2>
+
+
           <div className="row justify-content-center">
                 {this.state.data.response && this.state.searchArray.map((place,index) => {
                   return (
                     <div className="card col-lg-4 p-2 m-1">
-                         <h2 className="row justify-content-center">{place.title}</h2>
+                         <p className="row justify-content-center title">{place.title}</p>
                          <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
-                         <h3 className="row justify-content-center">{place.city}, {place.country}</h3>
-                         <button className="btn btn-danger" size="sm">Remove</button>
+                         <p className="row justify-content-center location">{place.city}, {place.country}</p>
                          <button className="btn btn-success" size="sm" onClick={() => this.favoriteClick(place)}>Favorite this</button>
                      </div>
                   );
                 })}
           </div>
+          <h2 className="row justify-content-center">Favorites</h2>
+          <div className="row justify-content-center">
+                {this.state.data.response && this.state.favoritePlaces.map((place,index) => {
+                  return (
+                    <div className="card col-lg-4 p-2 m-1">
+                         <p className="row justify-content-center title">{place.title}</p>
+                         <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
+                         <p className="row justify-content-center location">{place.city}, {place.country}</p>
+                         <button className="btn btn-danger" size="sm" onClick={(e) => this.delete(place.key)}>Remove</button>
+                     </div>
+                  );
+                })}
+          </div>
+
+
+
         </main>
 
       </BrowserRouter>
