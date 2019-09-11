@@ -2,20 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
 import App from './App';
 import Card from './Card';
-import Explore from './Explore';
-import Favorites from './Favorites';
 import firebase from 'firebase';
-// Firebase App (the core Firebase SDK) is always required and
-// must be listed before other Firebase SDKs
-// import * as firebase from "firebase/app";
-
-// Add the Firebase services that you want to use
-// import "firebase/auth";
-// import "firebase/firestore";
-// import BlogPost from './BlogPost';
-// import { stripWhateSpace, generateKey } from './utils/helper';
-
-
 
 export default class Router extends React.Component {
 
@@ -61,8 +48,6 @@ export default class Router extends React.Component {
 			this.setState({
 				favoritePlaces: favoritesArray
 			})
-
-
 		})
 	}
 
@@ -81,7 +66,7 @@ export default class Router extends React.Component {
         })
         allCities = data.response.groups[0].items;
 
-        for ( let key of allCities) {
+        for (let key of allCities) {
             let searchData = {
               title: key.venue.name,
               city: key.venue.location.city,
@@ -112,19 +97,16 @@ export default class Router extends React.Component {
     })
   }
 
+  delete = (key) => {
+  	this.state.database.ref('favoriteSavedFirebase/' + key).remove();
+  };
 
-  	delete = (key) => {
-  		this.state.database.ref('favoriteSavedFirebase/' + key).remove();
-  	};
-
-    update = (e,key,info) => {
-      this.state.database.ref('favoriteSavedFirebase/' + key).update({
-        notes: info
-			})
-      console.log(this.state.favoritePlaces)
+  update = (e,key,info) => {
+    this.state.database.ref('favoriteSavedFirebase/' + key).update({
+      notes: info
+		})
+    console.log(this.state.favoritePlaces)
 	}
-
-
 
   render() {
     let favoritePlaces = this.state.data.response && this.state.favoritePlaces.map((place,index) => {
@@ -133,16 +115,9 @@ export default class Router extends React.Component {
 
     return (
       <BrowserRouter>
-        <Link to="/">Home</Link>
-        <Link to="/explore">Explore</Link>
-        <Link to="/favorites">Favorites</Link>
-
         <Route path="/" component={App} exact />
-        <Route path="/explore" component={Explore} />
-        <Route path="/favorites" component={Favorites} />
-
         <main className="container p-3">
-          <h1 className="row justify-content-center">{this.state.websiteName}</h1>
+          <h1 className="row justify-content-center"><Link to="/">{this.state.websiteName}</Link></h1>
           <form className="row justify-content-center" onSubmit={this.handleSubmit}>
             <input type="text" className="" value={this.state.inputValue} onChange={this.handleChange} />
             <button className="btn btn-primary">Where do you want to explore?</button>
@@ -153,31 +128,17 @@ export default class Router extends React.Component {
                   return (
                     <div className="card col-lg-4 p-2 m-1">
                          <p className="row justify-content-center title">{place.title}</p>
-                         <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
+                         <img src="https://cdn.pixabay.com/photo/2018/08/01/21/26/map-3578213_960_720.jpg"/>
                          <p className="row justify-content-center location">{place.city}, {place.country}</p>
                         <button className="btn btn-success" size="sm" onClick={(e) => this.favoriteClick(place)}>Favorite this</button>                     </div>
                   );
                 })}
           </div>
-
-
-
-
           <h2 className="row justify-content-center">Favorites</h2>
-
           <div className="row justify-content-center">
                 {favoritePlaces}
           </div>
-
-
-
         </main>
-
       </BrowserRouter>
-
-
-
-    )
-
-  }
+    )}
 }
