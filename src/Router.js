@@ -56,7 +56,6 @@ export default class Router extends React.Component {
           key: item,
           item: favoritesData[item]
         });
-				console.log(favoritesArray)
 			}
 
 			this.setState({
@@ -90,7 +89,6 @@ export default class Router extends React.Component {
             }
             actualData.push(searchData);
             };
-            console.log(actualData)
         this.setState({
           searchArray: actualData
         })
@@ -112,22 +110,27 @@ export default class Router extends React.Component {
     this.state.database.ref('favoriteSavedFirebase').push({
       ...placeObject
     })
-    console.log(this.state.favoritePlaces)
   }
 
 
   	delete = (key) => {
   		this.state.database.ref('favoriteSavedFirebase/' + key).remove();
-      console.log(this.state.database)
   	};
+
+    update = (e,key,info) => {
+      this.state.database.ref('favoriteSavedFirebase/' + key).update({
+        notes: info
+			})
+      console.log(this.state.favoritePlaces)
+	}
 
 
 
   render() {
-    console.log(this.state.data.response && this.state.favoritePlaces)
-    let searchArray = this.state.data.response && this.state.searchArray.map((place,index) => {
-      return <Card place={place} delete={this.delete} favoriteClick={this.favoriteClick} />;
+    let favoritePlaces = this.state.data.response && this.state.favoritePlaces.map((place,index) => {
+      return <Card place={place} delete={this.delete} update={this.update} />;
     });
+
     return (
       <BrowserRouter>
         <Link to="/">Home</Link>
@@ -145,28 +148,25 @@ export default class Router extends React.Component {
             <button className="btn btn-primary">Where do you want to explore?</button>
           </form>
           <h2 className="row justify-content-center">Search Results</h2>
-
-
           <div className="row justify-content-center">
-                {searchArray}
-          </div>
-
-          <h2 className="row justify-content-center">Favorites</h2>
-          <div className="row justify-content-center">
-                {this.state.data.response && this.state.favoritePlaces.map((place,index) => {
+                {this.state.data.response && this.state.searchArray.map((place,index) => {
                   return (
                     <div className="card col-lg-4 p-2 m-1">
-                         <p className="row justify-content-center title">{place.item.title}</p>
+                         <p className="row justify-content-center title">{place.title}</p>
                          <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
-                         <p className="row justify-content-center location">{place.item.city}, {place.item.country}</p>
-                         <input type="text" value={this.state.value} onChange={this.handleUpdateChange} />
-                        <button onClick={(e) => this.triggerUpdateChange(e)}>
-                             Update Me
-                        </button>
-                         <button className="btn btn-danger" size="sm" onClick={(e) => this.delete(place.key)}>Remove</button>
-                     </div>
+                         <p className="row justify-content-center location">{place.city}, {place.country}</p>
+                        <button className="btn btn-success" size="sm" onClick={(e) => this.favoriteClick(place)}>Favorite this</button>                     </div>
                   );
                 })}
+          </div>
+
+
+
+
+          <h2 className="row justify-content-center">Favorites</h2>
+
+          <div className="row justify-content-center">
+                {favoritePlaces}
           </div>
 
 

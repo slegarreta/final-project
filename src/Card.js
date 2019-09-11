@@ -13,22 +13,25 @@ export default class Card extends React.Component {
 	}
 
 	triggerUpdateChange = (e) => {
-		this.props.update(e, this.props.key, this.state.value)
+		this.props.update(e, this.props.place.key, this.state.value)
 	}
 
 
 render(){
   return (
-        <div className="card col-lg-4 p-2 m-1">
-             <p className="row justify-content-center title">{this.props.place.title}</p>
-             <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
-             <p className="row justify-content-center location">{this.props.place.city}, {this.props.place.country}</p>
-             <button className="btn btn-success" size="sm" onClick={(e) => this.props.favoriteClick(this.props.place)}>Favorite this</button>
-             <input type="text" value={this.state.value} onChange={this.handleUpdateChange} />
-				     <button onClick={(e) => this.triggerUpdateChange(e)}>
-					        Update Me
-				     </button>
-         </div>
+    <div className="card col-lg-4 p-2 m-1">
+         <p className="row justify-content-center title">{this.props.place.item.title}</p>
+         <img src="https://image.shutterstock.com/image-photo/rome-october-4-2012-tourists-260nw-147643949.jpg"/>
+         <p className="row justify-content-center location">{this.props.place.item.city}, {this.props.place.item.country}</p>
+         <p>{this.props.place.item.notes}</p>
+         <input type="text" value={this.state.value} onChange={this.handleUpdateChange} />
+        <button onClick={(e) => this.triggerUpdateChange(e)}>
+             Update Notes
+        </button>
+         <button className="btn btn-danger" size="sm" onClick={(e) => this.props.delete(this.props.place.key)}>Remove</button>
+     </div>
+
+
       );
 }
 }
